@@ -3,5 +3,6 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/formula-reference-app/',
+  base: globalThis.process?.env?.GITHUB_ACTIONS ? '/formula-reference-app/' : '/',
+  server: { allowedHosts: true },
 })
