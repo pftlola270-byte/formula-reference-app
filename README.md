@@ -1,6 +1,6 @@
 # FormulaHub
 
-[![CI](https://github.com/pftlola270-byte/formula-reference-app/actions/workflows/deploy.yml/badge.svg)](https://github.com/pftlola270-byte/formula-reference-app/actions/workflows/deploy.yml) [![Tests](https://img.shields.io/badge/tests-8%20passing-24a276)](myapp/src/__tests__/formulas.test.mjs) [![Formulas](https://img.shields.io/badge/formulas-100-526dff)](https://pftlola270-byte.github.io/formula-reference-app/)
+[![CI](https://github.com/pftlola270-byte/formula-reference-app/actions/workflows/deploy.yml/badge.svg)](https://github.com/pftlola270-byte/formula-reference-app/actions/workflows/deploy.yml) [![Tests](https://img.shields.io/badge/tests-15%20passing-24a276)](myapp/src/__tests__/formulas.test.mjs) [![Formulas](https://img.shields.io/badge/formulas-100-526dff)](https://pftlola270-byte.github.io/formula-reference-app/)
 
 ![FormulaHub live demo](docs/screenshots/formulahub-live-demo.webp)
 

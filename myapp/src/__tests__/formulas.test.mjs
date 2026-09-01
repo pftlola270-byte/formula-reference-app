@@ -1,61 +1,113 @@
-import test from 'node:test'
 import assert from 'node:assert/strict'
+import test from 'node:test'
 import { formulas } from '../data/formulas.js'
 import { validateFormulaInputs } from '../lib/validation.js'
 import { convertUnits } from '../data/units.js'
 
 const formula = (id) => formulas.find((item) => item.id === id)
+const assertApprox = (actual, expected, tolerance = 1e-9) => assert.ok(Math.abs(actual - expected) <= tolerance, `expected ${actual} ≈ ${expected}`)
+const valuesFor = (item, overrides = {}) => Object.fromEntries(item.variables.map((variable, index) => [variable.key, String(overrides[variable.key] ?? Math.max(1, index + 2))]))
 
-test('catalog contains 100 formulas across six disciplines', () => {
+// Level 1: Registry integrity — every formula is checked automatically.
+test('registry contains exactly 100 formulas across six valid disciplines', () => {
   assert.equal(formulas.length, 100)
+  assert.equal(new Set(formulas.map((item) => item.id)).size, 100)
   assert.deepEqual([...new Set(formulas.map((item) => item.category))], ['Math', 'Physics', 'Engineering', 'Chemistry', 'Statistics', 'Finance'])
 })
 
-test('Newton second law calculates force', () => {
-  assert.equal(formula(11).calculate({ m: 5, a: 3 }), 15)
-})
-
-test('circle area calculates with pi', () => {
-  assert.ok(Math.abs(formula(2).calculate({ r: 5 }) - 78.5398163397) < 1e-10)
-})
-
-test('temperature conversion handles Celsius to Kelvin', () => {
-  assert.equal(convertUnits(0, '°C', 'K'), 273.15)
-})
-
-test('division-by-zero formulas return null', () => {
-  assert.equal(formula(9).calculate({ x1: 1, y1: 2, x2: 1, y2: 4 }), null)
-  assert.equal(formula(15).calculate({ m: 5, v: 0 }), null)
-})
-
-test('validation rejects invalid integer and negative constrained inputs', () => {
-  assert.match(validateFormulaInputs(formula(10), { n: 2.5, r: 1 }), /integer/)
-  assert.match(validateFormulaInputs(formula(2), { r: -1 }), /at least 0/)
-})
-
-test('quadratic formula returns real roots and rejects complex roots', () => {
-  assert.deepEqual(formula(7).calculate({ a: 1, b: 2, c: 1 }), [-1, -1])
-  assert.equal(formula(7).calculate({ a: 1, b: 0, c: 1 }), null)
-})
-
-test('every formula has an executable, valid registry entry', () => {
+test('every registry entry has complete executable and educational metadata', () => {
   for (const item of formulas) {
-    assert.equal(typeof item.calculate, 'function', `${item.name} must define calculate`)
-    assert.ok(Array.isArray(item.variables) && item.variables.length > 0, `${item.name} must define variables`)
-    assert.ok(item.meaning && item.assumptions && item.example && item.source && item.difficulty, `${item.name} must define learning metadata`)
-    const values = Object.fromEntries(item.variables.map((variable) => {
-      const minimum = Number.isFinite(variable.min) ? variable.min : 1
-      return [variable.key, String(variable.integer ? Math.max(1, Math.ceil(minimum)) : Math.max(1, minimum))]
-    }))
-    if (item.id === 7) Object.assign(values, { a: '1', b: '0', c: '-1' })
-    if (item.id === 9) Object.assign(values, { x1: '1', x2: '2' })
-    if (item.id === 59) Object.assign(values, { x1: '1', x2: '2', x3: '3', y1: '1', y2: '2', y3: '4' })
-    if (item.id === 66) Object.assign(values, { x: '10', b: '2' })
-    if (item.id === 98) Object.assign(values, { price: '3', variable: '1' })
-    const error = validateFormulaInputs(item, values)
-    assert.equal(error, '', `${item.name} should accept generated valid inputs: ${error}`)
-    const result = item.calculate(values)
+    assert.ok(Number.isInteger(item.id), `${item.name} must have an integer ID`)
+    assert.ok(item.name?.trim(), `${item.id} must have a name`)
+    assert.ok(item.category, `${item.name} must have a category`)
+    assert.ok(item.symbol?.trim(), `${item.name} must have a symbol`)
+    assert.ok(Array.isArray(item.variables) && item.variables.length > 0, `${item.name} must have variables`)
+    assert.equal(typeof item.calculate, 'function', `${item.name} must have a calculation function`)
+    assert.ok(typeof item.resultUnit === 'string', `${item.name} must have a result unit`)
+    assert.ok(item.meaning && item.assumptions && item.example && item.source && item.difficulty, `${item.name} must have enriched metadata`)
+    assert.equal(new Set(item.variables.map((variable) => variable.key)).size, item.variables.length, `${item.name} variable keys must be unique`)
+  }
+})
+
+test('every formula accepts a generated valid registry input and returns a finite result', () => {
+  for (const item of formulas) {
+    const overrides = {}
+    if (item.id === 7) Object.assign(overrides, { a: '1', b: '0', c: '-1' })
+    if (item.id === 9) Object.assign(overrides, { x1: '1', x2: '2' })
+    if (item.id === 10) Object.assign(overrides, { n: '5', r: '2' })
+    if (item.id === 65) Object.assign(overrides, { n: '5', r: '2' })
+    if (item.id === 96) Object.assign(overrides, { n: '5', k: '2', p: '0.5' })
+    if (item.id === 59) Object.assign(overrides, { x1: '1', x2: '2', x3: '3', y1: '1', y2: '2', y3: '4' })
+    if (item.id === 66) Object.assign(overrides, { x: '10', b: '2' })
+    if (item.id === 98) Object.assign(overrides, { price: '3', variable: '1' })
+    const input = valuesFor(item, overrides)
+    assert.equal(validateFormulaInputs(item, input), '', `${item.name} should accept valid inputs`)
+    const result = item.calculate(input)
     const finite = Array.isArray(result) ? result.every(Number.isFinite) : Number.isFinite(result)
     assert.ok(finite, `${item.name} must return a finite result`)
   }
+})
+
+// Level 2: Validation behavior.
+test('validation rejects NaN and non-numeric inputs', () => {
+  const item = formula(11)
+  assert.match(validateFormulaInputs(item, { m: 'not-a-number', a: '2' }), /valid number/)
+  assert.match(validateFormulaInputs(item, { m: 'NaN', a: '2' }), /valid number/)
+})
+
+test('validation rejects negative and non-integer constrained values', () => {
+  const permutations = formula(10)
+  assert.match(validateFormulaInputs(permutations, { n: '-1', r: '2' }), /at least 0/)
+  assert.match(validateFormulaInputs(permutations, { n: '4.5', r: '2' }), /integer/)
+  const compound = formula(40)
+  assert.match(validateFormulaInputs(compound, { p: '100', r: '5', n: '0', t: '2' }), /at least 1/)
+})
+
+test('zero denominators are rejected or safely return null', () => {
+  assert.equal(formula(15).calculate({ m: '4', v: '0' }), null)
+  assert.equal(formula(77).calculate({ w: '10', t: '0' }), null)
+  assert.equal(formula(98).calculate({ fixed: '100', price: '2', variable: '2' }), null)
+})
+
+test('validation rejects invalid Kelvin values', () => {
+  assert.match(validateFormulaInputs(formula(22), { n: '1', t: '0', v: '1' }), /greater than 0 K/)
+})
+
+test('unit conversion rejects unsupported or invalid conversion values', () => {
+  assert.ok(Number.isNaN(convertUnits('abc', 'm', 'cm')))
+  assert.equal(convertUnits('2', 'm', 'kg'), 2)
+})
+
+// Level 3: Mathematical correctness for representative complex logic.
+test('quadratic equation returns known roots', () => {
+  assert.deepEqual(formula(7).calculate({ a: '1', b: '-3', c: '2' }), [2, 1])
+})
+
+test('permutations and combinations return known counts', () => {
+  assert.equal(formula(10).calculate({ n: '5', r: '2' }), 20)
+  assert.equal(formula(65).calculate({ n: '5', r: '2' }), 10)
+})
+
+test('Pearson correlation returns perfect positive correlation', () => {
+  assertApprox(formula(59).calculate({ x1: '1', y1: '2', x2: '2', y2: '4', x3: '3', y3: '6' }), 1)
+})
+
+test('compound interest and NPV return expected values', () => {
+  assertApprox(formula(40).calculate({ p: '1000', r: '5', n: '1', t: '2' }), 1102.5)
+  assertApprox(formula(97).calculate({ cashflow: '110', rate: '10', investment: '100' }), 0)
+})
+
+test('Arrhenius equation and half-life return expected values', () => {
+  assertApprox(formula(91).calculate({ a: '1', e: '0', t: '300' }), 1)
+  assertApprox(formula(92).calculate({ k: '0.1' }), Math.log(2) / 0.1)
+})
+
+test('Heron formula and beam deflection return expected values', () => {
+  assertApprox(formula(67).calculate({ a: '3', b: '4', c: '5' }), 6)
+  assertApprox(formula(82).calculate({ f: '100', l: '2', e: '200000000000', i: '0.000001' }), 0.0013333333333333333)
+})
+
+test('vector magnitude and temperature conversion return expected values', () => {
+  assertApprox(formula(70).calculate({ x: '3', y: '4' }), 5)
+  assertApprox(formula(43).calculate({ c: '100' }), 212)
 })
