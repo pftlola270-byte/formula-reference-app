@@ -4,6 +4,7 @@ import { validateFormulaInputs } from './lib/validation'
 import { CalculatorPanel, FormulaLibrary } from './components/FormulaLibrary'
 import { HistoryPanel, ToolsPanel } from './components/Tools'
 import { useMemo, useState } from 'react'
+import { useFavorites, useHistory } from './hooks/usePersistedLists'
 
 const diagramFor = (formula) => formula.id === 2 || formula.id === 3 ? 'circle' : formula.id === 4 ? 'triangle' : formula.id === 11 ? 'force' : null
 
@@ -11,12 +12,12 @@ function App() {
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('All')
   const [selectedId, setSelectedId] = useState(11)
-  const [favorites, setFavorites] = useState(() => JSON.parse(localStorage.getItem('formula-favorites') || '[]'))
+  const { favorites, toggleFavorite } = useFavorites()
   const [values, setValues] = useState({})
   const [result, setResult] = useState(null)
   const [error, setError] = useState('')
   const [isDark, setIsDark] = useState(false)
-  const [history, setHistory] = useState(() => JSON.parse(localStorage.getItem('formula-history') || '[]'))
+  const { history, addHistory, clearHistory } = useHistory()
   const [showHistory, setShowHistory] = useState(false)
   const [quiz, setQuiz] = useState(null)
   const [quizAnswer, setQuizAnswer] = useState('')
@@ -42,10 +43,8 @@ function App() {
     setResult(calculated)
     addHistory(selectedFormula, calculated)
   }
-  const toggleFavorite = (id) => setFavorites((current) => { const next = current.includes(id) ? current.filter((item) => item !== id) : [...current, id]; localStorage.setItem('formula-favorites', JSON.stringify(next)); return next })
   const formattedResult = Array.isArray(result) ? result.map((item) => item.toFixed(3)).join('  or  ') : Number(result).toLocaleString('en-US', { maximumFractionDigits: 4 })
   const diagram = diagramFor(selectedFormula)
-  const addHistory = (formula, calculated) => { const item = { id: Date.now(), formula: formula.name, symbol: formula.symbol, result: Array.isArray(calculated) ? calculated.join(' or ') : Number(calculated).toFixed(3), time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }; const next = [item, ...history].slice(0, 12); setHistory(next); localStorage.setItem('formula-history', JSON.stringify(next)) }
   const convertValue = converter.amount === '' ? '' : convertUnits(converter.amount, converter.from, converter.to)
   const startQuiz = () => { const candidates = formulas.filter((item) => item.id !== 7); const item = candidates[Math.floor(Math.random() * candidates.length)]; const quizValues = Object.fromEntries(item.variables.map((variable, index) => [variable.key, String(index + 2)])); setQuiz({ formula: item, answer: item.calculate(quizValues), values: quizValues }); setQuizAnswer(''); setQuizMessage('') }
 
@@ -57,7 +56,7 @@ function App() {
         <section className="workspace" id="library"><div className="section-heading"><div><span className="section-kicker">Explore and learn</span><h2>Formula library</h2></div><span className="count-badge">{filteredFormulas.length} formulas</span></div><div className="toolbar"><label className="search-box"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search a formula, concept, or symbol..." aria-label="Search formulas" />{query && <button onClick={() => setQuery('')} aria-label="Clear search">×</button>}</label><div className="category-tabs">{categories.map((item) => <button key={item} className={category === item ? 'selected' : ''} onClick={() => setCategory(item)}>{item}</button>)}</div></div>
           <div className="content-grid"><FormulaLibrary formulas={filteredFormulas} selectedId={selectedFormula.id} onSelect={selectFormula} icons={icons} /><CalculatorPanel formula={selectedFormula} icon={icons[selectedFormula.category]} isFavorite={isFavorite} onToggleFavorite={toggleFavorite} values={values} onValueChange={handleValueChange} onCalculate={calculate} result={result} error={error} formattedResult={formattedResult} diagram={diagram} /></div></section>
         <ToolsPanel quiz={quiz} quizAnswer={quizAnswer} setQuizAnswer={setQuizAnswer} quizMessage={quizMessage} setQuizMessage={setQuizMessage} startQuiz={startQuiz} converter={converter} setConverter={setConverter} unitDefinitions={unitDefinitions} convertValue={convertValue} />
-        <HistoryPanel history={history} showHistory={showHistory} onClear={() => { setHistory([]); localStorage.removeItem('formula-history') }} />
+        <HistoryPanel history={history} showHistory={showHistory} onClear={clearHistory} />
         <section className="about-section" id="about"><span className="section-kicker">Built for curious minds</span><h2>Understand the formula, not just the answer.</h2><p>FormulaHub helps you move from theory to practice with a clear reference and a simple calculator for every formula.</p></section>
       </main><footer><span>FormulaHub © 2026</span><span>Made for learning and discovery</span></footer>
     </div>

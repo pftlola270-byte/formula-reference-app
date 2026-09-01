@@ -4,7 +4,7 @@ export const variableConstraints = {
   7: { a: { min: -Infinity }, b: {}, c: {} }, 10: { n: { min: 0, integer: true }, r: { min: 0, integer: true } },
   11: { m: { min: 0 }, a: {} }, 12: { m: { min: 0 }, v: {} }, 13: { m: { min: 0 }, g: { min: 0 }, h: { min: 0 } }, 15: { m: { min: 0 }, v: { min: 0 } }, 16: { f: {}, a: { min: 0 } }, 18: { m1: { min: 0 }, m2: { min: 0 }, r: { min: 0 } }, 19: { r: { min: 0 } }, 21: { k: { min: 0 }, x: { min: 0 } }, 22: { n: { min: 0 }, t: { min: 0 }, v: { min: 0 } },
   33: { n: { min: 0 }, v: { min: 0 } }, 34: { h: { min: 0 } }, 35: { m1: { min: 0 }, v1: { min: 0 }, v2: { min: 0 } }, 36: { solute: { min: 0 }, solution: { min: 0 } },
-  37: { sd: { min: 0 } }, 40: { p: { min: 0 }, r: { min: 0 }, n: { min: 0, integer: true }, t: { min: 0 } }, 41: { p: { min: 0 }, r: {}, t: { min: 0 } }, 42: { fv: { min: 0 }, r: { min: 0 }, t: { min: 0 } }, 43: { profit: {}, revenue: { min: 0 } }, 44: { profit: {}, cost: { min: 0 } },
+  37: { sd: { min: 0 } }, 40: { p: { min: 0 }, r: { min: 0 }, n: { min: 1, integer: true }, t: { min: 0 } }, 41: { p: { min: 0 }, r: {}, t: { min: 0 } }, 42: { fv: { min: 0 }, r: { min: 0 }, t: { min: 0 } }, 43: { profit: {}, revenue: { min: 0 } }, 44: { profit: {}, cost: { min: 0 } },
 }
 
 const metadata = {

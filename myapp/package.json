@@ -1,10 +1,12 @@
 {
-  "name": "myapp",
+  "name": "formulahub",
   "private": true,
-  "version": "0.0.0",
+  "description": "Interactive scientific formula reference and calculator",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "test": "node --test src/__tests__/*.test.mjs",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
