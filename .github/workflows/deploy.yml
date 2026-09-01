@@ -37,6 +37,9 @@ jobs:
       - name: Lint
         working-directory: myapp
         run: npm run lint
+      - name: Typecheck
+        working-directory: myapp
+        run: npm run typecheck
       - name: Build
         working-directory: myapp
         run: npm run build
