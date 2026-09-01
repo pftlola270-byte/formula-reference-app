@@ -3,10 +3,21 @@ import test from 'node:test'
 import { formulas } from '../data/formulas.js'
 import { validateFormulaInputs } from '../lib/validation.js'
 import { convertUnits } from '../data/units.js'
+import { localizeFormula } from '../formulaTranslations.js'
 
 const formula = (id) => formulas.find((item) => item.id === id)
 const assertApprox = (actual, expected, tolerance = 1e-9) => assert.ok(Math.abs(actual - expected) <= tolerance, `expected ${actual} ≈ ${expected}`)
 const valuesFor = (item, overrides = {}) => Object.fromEntries(item.variables.map((variable, index) => [variable.key, String(overrides[variable.key] ?? Math.max(1, index + 2))]))
+
+test('Arabic localization covers every formula display record', () => {
+  const localized = formulas.map((item) => localizeFormula(item, 'ar'))
+  assert.equal(localized.length, 100)
+  for (const item of localized) {
+    assert.ok(item.name && item.name !== formula(item.id).name, `${item.id} needs an Arabic name`)
+    assert.match(item.description, /[\u0600-\u06FF]/, `${item.id} needs an Arabic description`)
+    for (const variable of item.variables) assert.match(variable.label, /[\u0600-\u06FF]/, `${item.id} variable ${variable.key} needs Arabic text`)
+  }
+})
 
 // Level 1: Registry integrity — every formula is checked automatically.
 test('registry contains exactly 100 formulas across six valid disciplines', () => {

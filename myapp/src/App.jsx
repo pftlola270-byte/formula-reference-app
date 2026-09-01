@@ -7,12 +7,14 @@ import { ToolsPanel } from './components/Tools'
 import { HistoryPanel } from './components/HistoryPanel'
 import { useMemo, useState } from 'react'
 import { useLanguage } from './i18n'
+import { localizeFormula } from './formulaTranslations'
 import { useFavorites, useHistory } from './hooks/usePersistedLists'
 
 const diagramFor = (formula) => formula.id === 2 || formula.id === 3 ? 'circle' : formula.id === 4 ? 'triangle' : formula.id === 11 ? 'force' : null
 
 function App() {
   const { language, setLanguage, t } = useLanguage()
+  const localizedFormulas = useMemo(() => formulas.map((formula) => localizeFormula(formula, language)), [language])
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('All')
   const [selectedId, setSelectedId] = useState(11)
@@ -28,11 +30,11 @@ function App() {
   const [quizMessage, setQuizMessage] = useState('')
   const [converter, setConverter] = useState({ amount: '', from: 'm', to: 'cm' })
 
-  const filteredFormulas = useMemo(() => formulas.filter((formula) => {
+  const filteredFormulas = useMemo(() => localizedFormulas.filter((formula) => {
     const searchable = `${formula.name} ${formula.description} ${formula.symbol} ${formula.category}`.toLowerCase()
     return (category === 'All' || formula.category === category) && searchable.includes(query.toLowerCase())
-  }), [category, query])
-  const selectedFormula = formulas.find((formula) => formula.id === selectedId) || formulas[0]
+  }), [category, query, localizedFormulas])
+  const selectedFormula = localizedFormulas.find((formula) => formula.id === selectedId) || localizedFormulas[0]
   const isFavorite = favorites.includes(selectedFormula.id)
 
   const selectFormula = (id) => { setSelectedId(id); setResult(null); setError(''); setValues({}) }
@@ -50,7 +52,7 @@ function App() {
   const formattedResult = Array.isArray(result) ? result.map((item) => item.toFixed(3)).join('  or  ') : Number(result).toLocaleString('en-US', { maximumFractionDigits: 4 })
   const diagram = diagramFor(selectedFormula)
   const convertValue = converter.amount === '' ? '' : convertUnits(converter.amount, converter.from, converter.to)
-  const startQuiz = () => { const candidates = formulas.filter((item) => item.id !== 7); const item = candidates[Math.floor(Math.random() * candidates.length)]; const quizValues = Object.fromEntries(item.variables.map((variable, index) => [variable.key, String(index + 2)])); setQuiz({ formula: item, answer: item.calculate(quizValues), values: quizValues }); setQuizAnswer(''); setQuizMessage('') }
+  const startQuiz = () => { const candidates = localizedFormulas.filter((item) => item.id !== 7); const item = candidates[Math.floor(Math.random() * candidates.length)]; const quizValues = Object.fromEntries(item.variables.map((variable, index) => [variable.key, String(index + 2)])); setQuiz({ formula: item, answer: item.calculate(quizValues), values: quizValues }); setQuizAnswer(''); setQuizMessage('') }
 
   return (
     <div className={isDark ? 'app dark' : 'app'}>
