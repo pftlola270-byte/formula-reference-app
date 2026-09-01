@@ -6,8 +6,8 @@ import { convertUnits } from '../data/units.js'
 
 const formula = (id) => formulas.find((item) => item.id === id)
 
-test('catalog contains 62 formulas across six disciplines', () => {
-  assert.equal(formulas.length, 62)
+test('catalog contains 100 formulas across six disciplines', () => {
+  assert.equal(formulas.length, 100)
   assert.deepEqual([...new Set(formulas.map((item) => item.category))], ['Math', 'Physics', 'Engineering', 'Chemistry', 'Statistics', 'Finance'])
 })
 
@@ -50,6 +50,8 @@ test('every formula has an executable, valid registry entry', () => {
     if (item.id === 7) Object.assign(values, { a: '1', b: '0', c: '-1' })
     if (item.id === 9) Object.assign(values, { x1: '1', x2: '2' })
     if (item.id === 59) Object.assign(values, { x1: '1', x2: '2', x3: '3', y1: '1', y2: '2', y3: '4' })
+    if (item.id === 66) Object.assign(values, { x: '10', b: '2' })
+    if (item.id === 98) Object.assign(values, { price: '3', variable: '1' })
     const error = validateFormulaInputs(item, values)
     assert.equal(error, '', `${item.name} should accept generated valid inputs: ${error}`)
     const result = item.calculate(values)
