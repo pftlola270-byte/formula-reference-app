@@ -15,6 +15,17 @@ const metadata = {
   62: { meaning: 'Return on investment compares profit with the original cost.', assumptions: 'Investment cost is positive and profit uses the same currency.', example: 'Profit = $200 and cost = $1,000 gives ROI = 20%.', relatedFormulas: ['Profit Margin', 'Future Value'], source: 'Introductory finance', difficulty: 'Beginner' },
 }
 
+const sourceRecords = {
+  10: { title: 'Introductory Statistics 2e', organization: 'OpenStax', url: 'https://openstax.org/books/introductory-statistics-2e/pages/f-mathematical-phrases-symbols-and-formulas', chapter: 'Appendix F', section: 'Formula 1: Factorial', verified: true, rationale: 'Defines factorial notation used by the permutation formula.' },
+  19: { title: 'University Physics Volume 2', organization: 'OpenStax', url: 'https://openstax.org/books/university-physics-volume-2/pages/5-key-equations', chapter: 'Chapter 5', section: 'Key Equations — Coulomb’s law', verified: true, rationale: 'Lists Coulomb’s law as a key electric-force equation.' },
+  43: { title: 'Chemistry 2e', organization: 'OpenStax', url: 'https://openstax.org/books/chemistry-2e/pages/1-key-equations', chapter: 'Chapter 1', section: 'Key Equations — Temperature', verified: true, rationale: 'Lists the Celsius-to-Fahrenheit conversion relationship.' },
+  51: { title: 'Physics', organization: 'OpenStax', url: 'https://openstax.org/books/physics/pages/3-key-equations', chapter: 'Chapter 3', section: '3.2 — Velocity with constant acceleration', verified: true, rationale: 'Lists velocity with constant acceleration as a key equation.' },
+  52: { title: 'Physics', organization: 'OpenStax', url: 'https://openstax.org/books/physics/pages/3-key-equations', chapter: 'Chapter 3', section: '3.2 — Displacement with constant acceleration', verified: true, rationale: 'Lists displacement with constant acceleration as a key equation.' },
+  53: { title: 'Physics', organization: 'OpenStax', url: 'https://openstax.org/books/physics/pages/3-key-equations', chapter: 'Chapter 3', section: '3.2 — Constant acceleration', verified: true, rationale: 'Lists the velocity-position equation for constant acceleration.' },
+  65: { title: 'Introductory Statistics 2e', organization: 'OpenStax', url: 'https://openstax.org/books/introductory-statistics-2e/pages/f-mathematical-phrases-symbols-and-formulas', chapter: 'Appendix F', section: 'Formula 2: Combinations', verified: true, rationale: 'Defines the combinations formula used by this calculator.' },
+  96: { title: 'Introductory Statistics 2e', organization: 'OpenStax', url: 'https://openstax.org/books/introductory-statistics-2e/pages/f-mathematical-phrases-symbols-and-formulas', chapter: 'Appendix F', section: 'Formula 3: Binomial Distribution', verified: true, rationale: 'Defines the binomial probability relationship used by this calculator.' },
+}
+
 const defaults = (formula) => ({
   meaning: formula.description,
   assumptions: 'Uses idealized inputs in the stated units.',
@@ -28,5 +39,6 @@ export const enrichFormulas = (rawFormulas) => rawFormulas.map((formula) => ({
   ...formula,
   ...defaults(formula),
   ...(metadata[formula.id] || {}),
+  ...(sourceRecords[formula.id] ? { source: sourceRecords[formula.id] } : {}),
   variables: formula.variables.map((variable) => ({ ...variable, ...(variableConstraints[formula.id]?.[variable.key] || {}) })),
 }))

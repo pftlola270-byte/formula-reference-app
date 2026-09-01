@@ -29,6 +29,18 @@ test('every registry entry has complete executable and educational metadata', ()
   }
 })
 
+test('verified source records follow the traceability schema', () => {
+  const traceable = formulas.filter((item) => typeof item.source === 'object')
+  assert.ok(traceable.length >= 8)
+  for (const item of traceable) {
+    assert.ok(item.source.title?.trim(), `${item.name} source needs a title`)
+    assert.ok(item.source.organization?.trim(), `${item.name} source needs an organization`)
+    assert.match(item.source.url, /^https:\/\//, `${item.name} source needs a secure URL`)
+    assert.equal(item.source.verified, true, `${item.name} source must be verified`)
+    assert.ok(item.source.rationale?.trim(), `${item.name} source needs a rationale`)
+  }
+})
+
 test('every formula accepts a generated valid registry input and returns a finite result', () => {
   for (const item of formulas) {
     const overrides = {}

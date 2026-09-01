@@ -24,6 +24,10 @@ The Tools section includes a random quick quiz with answer checking and a unit c
 
 The fastest way to evaluate the project is to open the live demo: it includes 100 formulas, six disciplines, formula validation, persistent favorites and history, unit conversion, diagrams, and a quick quiz.
 
+### Academic traceability (v1.1)
+
+FormulaHub is introducing academic source traceability incrementally. Verified records use a shared source schema with a title, organization, secure URL, chapter or section when confirmed, a rationale for relevance, and `verified: true`. The first verified batch covers selected physics, chemistry, statistics, and probability relationships; unverified formulas are intentionally not assigned guessed references.
+
 ## Project structure
 
 ```text
