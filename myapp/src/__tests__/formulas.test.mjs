@@ -37,3 +37,23 @@ test('quadratic formula returns real roots and rejects complex roots', () => {
   assert.deepEqual(formula(7).calculate({ a: 1, b: 2, c: 1 }), [-1, -1])
   assert.equal(formula(7).calculate({ a: 1, b: 0, c: 1 }), null)
 })
+
+test('every formula has an executable, valid registry entry', () => {
+  for (const item of formulas) {
+    assert.equal(typeof item.calculate, 'function', `${item.name} must define calculate`)
+    assert.ok(Array.isArray(item.variables) && item.variables.length > 0, `${item.name} must define variables`)
+    assert.ok(item.meaning && item.assumptions && item.example && item.source && item.difficulty, `${item.name} must define learning metadata`)
+    const values = Object.fromEntries(item.variables.map((variable) => {
+      const minimum = Number.isFinite(variable.min) ? variable.min : 1
+      return [variable.key, String(variable.integer ? Math.max(1, Math.ceil(minimum)) : Math.max(1, minimum))]
+    }))
+    if (item.id === 7) Object.assign(values, { a: '1', b: '0', c: '-1' })
+    if (item.id === 9) Object.assign(values, { x1: '1', x2: '2' })
+    if (item.id === 59) Object.assign(values, { x1: '1', x2: '2', x3: '3', y1: '1', y2: '2', y3: '4' })
+    const error = validateFormulaInputs(item, values)
+    assert.equal(error, '', `${item.name} should accept generated valid inputs: ${error}`)
+    const result = item.calculate(values)
+    const finite = Array.isArray(result) ? result.every(Number.isFinite) : Number.isFinite(result)
+    assert.ok(finite, `${item.name} must return a finite result`)
+  }
+})

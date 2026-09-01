@@ -14,19 +14,33 @@ The application includes persistent favorites saved under `formula-favorites` in
 
 The Tools section includes a random quick quiz with answer checking and a unit converter. The converter supports length (`mm`, `cm`, `m`, `km`, `in`, `ft`, `yd`, `mi`), mass (`mg`, `g`, `kg`, `lb`), time (`ms`, `s`, `min`, `h`, `day`), temperature (`°C`, `°F`, `K`), and pressure (`Pa`, `kPa`, `bar`, `atm`, `mmHg`). Formula-specific visual diagrams are available for selected geometry and physics relationships.
 
+## Live Demo
+
+[Open FormulaHub](https://pftlola270-byte.github.io/formula-reference-app/)
+
+The fastest way to evaluate the project is to open the live demo: it includes 62 formulas, six disciplines, formula validation, persistent favorites and history, unit conversion, diagrams, and a quick quiz.
+
 ## Project structure
 
 ```text
 myapp/src/
 ├── components/
-│   └── FormulaLibrary.jsx       # Formula list and calculator presentation
+│   ├── FormulaLibrary.jsx       # Formula list composition
+│   ├── FormulaCard.jsx          # Individual formula card
+│   ├── CalculatorPanel.jsx      # Formula details and calculator UI
+│   └── FormulaDiagram.jsx       # Optional visual diagrams
 ├── data/
 │   ├── formulas.js              # Formula catalog and calculation functions
 │   ├── formulaMetadata.js       # Constraints and educational metadata
 │   └── units.js                  # Categories, icons, unit definitions, conversions
+├── hooks/
+│   └── usePersistedLists.js      # Favorites and history state
 ├── lib/
-│   └── validation.js             # Reusable formula input validation
+│   ├── validation.js             # Reusable formula input validation
+│   └── storage.js                # Safe Local Storage helpers
 ├── App.jsx                       # Application state and page composition
+├── __tests__/
+│   └── formulas.test.mjs         # Formula integrity and behavior tests
 ├── index.css                     # Global responsive styling
 └── main.jsx                      # React entry point
 ```
@@ -45,6 +59,7 @@ Open the local URL shown by Vite, usually `http://localhost:5173`.
 
 ```bash
 cd myapp
+npm test
 npm run lint
 npm run build
 ```
