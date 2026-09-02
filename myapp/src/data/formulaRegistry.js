@@ -1,4 +1,5 @@
 import { formulas } from './formulas.js'
+import { variableConstraints } from './formulaMetadata.js'
 
 const slugOverrides = {
   11: 'newtons-second-law',
@@ -16,6 +17,7 @@ export const formulaRegistry = formulas.map((formula) => ({
   ...formula,
   slug: slugOverrides[formula.id] || slugify(formula.name),
   relatedFormulaIds: [],
+  constraints: variableConstraints[formula.id] || {},
 }))
 
 const bySlug = new Map(formulaRegistry.map((formula) => [formula.slug, formula]))

@@ -5,6 +5,7 @@ import { formulaRegistry, getFormulaById, getFormulaBySlug } from '../data/formu
 import { validateFormulaInputs } from '../lib/validation.js'
 import { convertUnits, convertUnitsSafe } from '../data/units.js'
 import { localizeFormula } from '../formulaTranslations.js'
+import { calculateFormula } from '../lib/calculationEngine.js'
 
 const formula = (id) => formulas.find((item) => item.id === id)
 const assertApprox = (actual, expected, tolerance = 1e-9) => assert.ok(Math.abs(actual - expected) <= tolerance, `expected ${actual} ≈ ${expected}`)
@@ -124,6 +125,22 @@ test('unit conversion enforces dimensions and returns structured errors', () => 
 test('unit conversion rejects unsupported or invalid conversion values', () => {
   assert.equal(convertUnits('abc', 'm', 'cm'), null)
   assert.equal(convertUnits('2', 'm', 'kg'), null)
+})
+
+test('calculation core returns a unified success result', () => {
+  const result = calculateFormula(formula(11), { m: '5', a: '3' })
+  assert.equal(result.success, true)
+  assert.equal(result.result, 15)
+  assert.equal(result.unit, 'N')
+  assert.equal(result.error, null)
+  assert.ok(Array.isArray(result.trace))
+})
+
+test('calculation core returns structured errors for invalid and non-finite results', () => {
+  const missing = calculateFormula(formula(11), { m: '5' })
+  assert.equal(missing.error.code, 'INVALID_INPUT')
+  const invalid = calculateFormula({ ...formula(9), validate: (values) => validateFormulaInputs(formula(9), values) }, { x1: '1', y1: '2', x2: '1', y2: '4' })
+  assert.equal(invalid.error.code, 'OUT_OF_DOMAIN')
 })
 
 // Level 3: Mathematical correctness for representative complex logic.

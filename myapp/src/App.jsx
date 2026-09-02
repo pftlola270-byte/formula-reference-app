@@ -1,6 +1,7 @@
 import { formulaRegistry as formulas } from './data/formulaRegistry'
 import { categories, convertUnits, icons, unitDefinitions } from './data/units'
 import { validateFormulaInputs } from './lib/validation'
+import { calculateFormula } from './lib/calculationEngine'
 import { CalculatorPanel } from './components/CalculatorPanel'
 import { FormulaLibrary } from './components/FormulaLibrary'
 import { ToolsPanel } from './components/Tools'
@@ -42,13 +43,10 @@ function App() {
   const handleValueChange = (variable, value) => { const next = { ...values, [variable.key]: value }; setValues(next); setError(''); setResult(null); if (selectedFormula.variables.every(({ key }) => next[key] !== undefined && next[key] !== '')) { const validationError = validateFormulaInputs(selectedFormula, next); if (!validationError) { const live = selectedFormula.calculate(next); if (live !== null && !Number.isNaN(live)) setResult(live) } } }
   const calculate = () => {
     setError('')
-    if (!selectedFormula.variables.every(({ key }) => values[key] !== undefined && values[key] !== '')) { setError(t.fillFields); return }
-    const validationError = validateFormulaInputs(selectedFormula, values)
-    if (validationError) { setError(validationError); setResult(null); return }
-    const calculated = selectedFormula.calculate(values)
-    if (calculated === null || Number.isNaN(calculated)) { setError(t.invalidResult); setResult(null); return }
-    setResult(calculated)
-    addHistory(selectedFormula, calculated)
+    const calculation = calculateFormula({ ...selectedFormula, validate: (input) => validateFormulaInputs(selectedFormula, input) }, values)
+    if (!calculation.success) { setError(calculation.error.code === 'INVALID_INPUT' ? t.fillFields : t.invalidResult); setResult(null); return }
+    setResult(calculation.result)
+    addHistory(selectedFormula, calculation.result)
   }
   const formattedResult = Array.isArray(result) ? result.map((item) => item.toFixed(3)).join('  or  ') : Number(result).toLocaleString('en-US', { maximumFractionDigits: 4 })
   const diagram = diagramFor(selectedFormula)
