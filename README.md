@@ -26,7 +26,7 @@ The fastest way to evaluate the project is to open the live demo: it includes 10
 
 ### Academic traceability (v1.1)
 
-Academic traceability is being introduced incrementally, with verified source records added only after direct verification. Verified records use a shared source schema with a title, organization, secure URL, chapter or section when confirmed, a rationale for relevance, `sourceType: "direct"` or `"supporting"`, and `verified: true`. Supporting sources are explicitly distinguished from direct formula references. Unverified formulas use `source: null` and are displayed as “Academic source: Not yet verified”; they are intentionally not assigned guessed references. The current release contains 8 verified source records across selected physics, chemistry, statistics, and probability relationships.
+Academic traceability is being introduced incrementally, with verified source records added only after direct verification. Verified records use a shared source schema with a title, organization, secure URL, chapter or section when confirmed, a rationale for relevance, and `status: "direct"` or `"supporting"`. A direct source supports the exact formula; a supporting source covers part of the formula or its context. Unverified formulas use `source: null` and are displayed as “Academic source: Not yet verified”; they are intentionally not assigned guessed references. The current release contains **8 source records: 7 direct references and 1 supporting reference** across selected physics, chemistry, statistics, and probability relationships.
 
 ## Project structure
 

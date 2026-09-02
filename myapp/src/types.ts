@@ -4,7 +4,7 @@ export interface FormulaSource {
   url: string
   chapter?: string
   section?: string
-  verified: boolean
+  status: 'direct' | 'supporting' | 'pending'
   rationale: string
 }
 
@@ -31,6 +31,6 @@ export interface Formula {
   assumptions: string
   example: string
   relatedFormulas: string[]
-  source: FormulaSource | string
+  source: FormulaSource | string | null
   difficulty: string
 }

@@ -41,15 +41,20 @@ test('every registry entry has complete executable and educational metadata', ()
   }
 })
 
-test('verified source records follow the traceability schema', () => {
+test('source records follow the traceability schema and exact coverage', () => {
   const traceable = formulas.filter((item) => typeof item.source === 'object' && item.source !== null)
-  assert.ok(traceable.length >= 8)
+  const directlyVerified = traceable.filter((item) => item.source.status === 'direct')
+  const supporting = traceable.filter((item) => item.source.status === 'supporting')
+  const expectedSourceRecords = 8
+  assert.equal(traceable.length, expectedSourceRecords)
+  assert.equal(directlyVerified.length, 7)
+  assert.equal(supporting.length, 1)
   for (const item of traceable) {
     assert.ok(item.source.title?.trim(), `${item.name} source needs a title`)
     assert.ok(item.source.organization?.trim(), `${item.name} source needs an organization`)
     assert.match(item.source.url, /^https:\/\//, `${item.name} source needs a secure URL`)
-    assert.equal(item.source.verified, true, `${item.name} source must be verified`)
-    assert.ok(['direct', 'supporting'].includes(item.source.sourceType), `${item.name} source needs direct/supporting type`)
+    assert.ok(['direct', 'supporting', 'pending'].includes(item.source.status), `${item.name} source needs a valid status`)
+    assert.notEqual(item.source.status, 'pending', `${item.name} pending source cannot be counted as traceable`)
     assert.ok(item.source.rationale?.trim(), `${item.name} source needs a rationale`)
   }
 })
