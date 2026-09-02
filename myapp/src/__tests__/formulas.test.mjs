@@ -3,7 +3,7 @@ import test from 'node:test'
 import { formulas } from '../data/formulas.js'
 import { formulaRegistry, getFormulaById, getFormulaBySlug } from '../data/formulaRegistry.js'
 import { validateFormulaInputs } from '../lib/validation.js'
-import { convertUnits } from '../data/units.js'
+import { convertUnits, convertUnitsSafe } from '../data/units.js'
 import { localizeFormula } from '../formulaTranslations.js'
 
 const formula = (id) => formulas.find((item) => item.id === id)
@@ -115,9 +115,15 @@ test('validation rejects invalid Kelvin values', () => {
   assert.match(validateFormulaInputs(formula(22), { n: '1', t: '0', v: '1' }), /greater than 0 K/)
 })
 
+test('unit conversion enforces dimensions and returns structured errors', () => {
+  assert.deepEqual(convertUnitsSafe(2, 'm', 'kg'), { success: false, error: { code: 'INCOMPATIBLE_UNITS', field: 'unit', params: { from: 'm', to: 'kg' } } })
+  assert.deepEqual(convertUnitsSafe(Number.NaN, 'm', 'cm'), { success: false, error: { code: 'INVALID_INPUT', field: 'amount' } })
+  assert.equal(convertUnitsSafe(2, 'km', 'm').result, 2000)
+})
+
 test('unit conversion rejects unsupported or invalid conversion values', () => {
-  assert.ok(Number.isNaN(convertUnits('abc', 'm', 'cm')))
-  assert.equal(convertUnits('2', 'm', 'kg'), 2)
+  assert.equal(convertUnits('abc', 'm', 'cm'), null)
+  assert.equal(convertUnits('2', 'm', 'kg'), null)
 })
 
 // Level 3: Mathematical correctness for representative complex logic.

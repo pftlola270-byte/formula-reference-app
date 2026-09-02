@@ -1,4 +1,4 @@
-import { formulas } from './data/formulas'
+import { formulaRegistry as formulas } from './data/formulaRegistry'
 import { categories, convertUnits, icons, unitDefinitions } from './data/units'
 import { validateFormulaInputs } from './lib/validation'
 import { CalculatorPanel } from './components/CalculatorPanel'
