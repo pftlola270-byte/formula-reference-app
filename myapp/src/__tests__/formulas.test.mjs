@@ -6,6 +6,7 @@ import { validateFormulaInputs } from '../lib/validation.js'
 import { convertUnits, convertUnitsSafe } from '../data/units.js'
 import { localizeFormula } from '../formulaTranslations.js'
 import { calculateFormula } from '../lib/calculationEngine.js'
+import { checkDimensions, dimensionSignatures } from '../lib/dimensionEngine.js'
 
 const formula = (id) => formulas.find((item) => item.id === id)
 const assertApprox = (actual, expected, tolerance = 1e-9) => assert.ok(Math.abs(actual - expected) <= tolerance, `expected ${actual} ≈ ${expected}`)
@@ -127,6 +128,12 @@ test('unit conversion rejects unsupported or invalid conversion values', () => {
   assert.equal(convertUnits('2', 'm', 'kg'), null)
 })
 
+test('dimension signatures balance for representative formulas', () => {
+  assert.equal(Object.keys(dimensionSignatures).length, 5)
+  for (const id of Object.keys(dimensionSignatures)) assert.equal(checkDimensions(Number(id)).compatible, true)
+  assert.equal(checkDimensions(1).checked, false)
+})
+
 test('calculation core returns a unified success result', () => {
   const result = calculateFormula(formula(11), { m: '5', a: '3' })
   assert.equal(result.success, true)
@@ -138,7 +145,7 @@ test('calculation core returns a unified success result', () => {
 
 test('calculation core returns structured errors for invalid and non-finite results', () => {
   const missing = calculateFormula(formula(11), { m: '5' })
-  assert.equal(missing.error.code, 'INVALID_INPUT')
+  assert.equal(missing.error.code, 'INPUT_REQUIRED')
   const invalid = calculateFormula({ ...formula(9), validate: (values) => validateFormulaInputs(formula(9), values) }, { x1: '1', y1: '2', x2: '1', y2: '4' })
   assert.equal(invalid.error.code, 'OUT_OF_DOMAIN')
 })

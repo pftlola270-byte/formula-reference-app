@@ -43,8 +43,8 @@ function App() {
   const handleValueChange = (variable, value) => { const next = { ...values, [variable.key]: value }; setValues(next); setError(''); setResult(null); if (selectedFormula.variables.every(({ key }) => next[key] !== undefined && next[key] !== '')) { const validationError = validateFormulaInputs(selectedFormula, next); if (!validationError) { const live = selectedFormula.calculate(next); if (live !== null && !Number.isNaN(live)) setResult(live) } } }
   const calculate = () => {
     setError('')
-    const calculation = calculateFormula({ ...selectedFormula, validate: (input) => validateFormulaInputs(selectedFormula, input) }, values)
-    if (!calculation.success) { setError(calculation.error.code === 'INVALID_INPUT' ? t.fillFields : t.invalidResult); setResult(null); return }
+    const calculation = calculateFormula(selectedFormula, values)
+    if (!calculation.success) { setError(['INPUT_REQUIRED', 'INPUT_INVALID'].includes(calculation.error.code) ? t.fillFields : t.invalidResult); setResult(null); return }
     setResult(calculation.result)
     addHistory(selectedFormula, calculation.result)
   }
