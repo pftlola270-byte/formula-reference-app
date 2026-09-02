@@ -8,7 +8,7 @@ FormulaHub is a multilingual, searchable science reference and learning system f
 
 ## Features
 
-FormulaHub provides a searchable formula library across six disciplines. Users can filter by category, open any formula in the calculator, enter values, and receive a formatted result immediately. The interface is responsive for desktop and mobile screens and supports light and dark themes.
+FormulaHub provides a searchable formula library across six disciplines. Users can filter by category, open any formula in the calculator, enter values, and receive a formatted result immediately. The interface is responsive for desktop and mobile screens and supports light and dark themes. Each formula also has a stable URL slug through the central Formula Registry, making future formula pages and sharing safer than relying on translated display names.
 
 Each formula is represented as structured data with its name, symbolic expression, category, description, variables, units, explicit input constraints, calculation function, result label, result unit, learning meaning, assumptions, example guidance, related formulas, source note, and difficulty level. This keeps domain data separate from the application UI and makes the catalog easier to extend.
 
@@ -39,8 +39,9 @@ myapp/src/
 │   ├── FormulaDiagram.jsx       # Optional visual diagrams
 │   └── HistoryPanel.jsx          # Persistent calculation history
 ├── data/
-│   ├── formulas.js              # Formula catalog and calculation functions
+│   ├── formulas.js              # Formula calculations and base catalog
 │   ├── formulaMetadata.js       # Constraints and educational metadata
+│   ├── formulaRegistry.js       # Central registry, stable slugs, and lookups
 │   └── units.js                  # Categories, icons, unit definitions, conversions
 ├── hooks/
 │   └── usePersistedLists.js      # Favorites and history state
@@ -70,6 +71,7 @@ Open the local URL shown by Vite, usually `http://localhost:5173`.
 cd myapp
 npm test
 npm run lint
+npm run typecheck
 npm run build
 ```
 

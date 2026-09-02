@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { formulas } from '../data/formulas.js'
+import { formulaRegistry, getFormulaById, getFormulaBySlug } from '../data/formulaRegistry.js'
 import { validateFormulaInputs } from '../lib/validation.js'
 import { convertUnits } from '../data/units.js'
 import { localizeFormula } from '../formulaTranslations.js'
@@ -16,6 +17,17 @@ test('Arabic localization covers every formula display record', () => {
     assert.ok(item.name && item.name !== formula(item.id).name, `${item.id} needs an Arabic name`)
     assert.match(item.description, /[\u0600-\u06FF]/, `${item.id} needs an Arabic description`)
     for (const variable of item.variables) assert.match(variable.label, /[\u0600-\u06FF]/, `${item.id} variable ${variable.key} needs Arabic text`)
+  }
+})
+
+test('formula registry provides stable unique slugs and lookups', () => {
+  assert.equal(formulaRegistry.length, 100)
+  assert.equal(new Set(formulaRegistry.map((item) => item.slug)).size, 100)
+  for (const item of formulaRegistry) {
+    assert.match(item.slug, /^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+    assert.equal(getFormulaById(item.id)?.slug, item.slug)
+    assert.equal(getFormulaBySlug(item.slug)?.id, item.id)
+    assert.ok(Array.isArray(item.relatedFormulaIds))
   }
 })
 
