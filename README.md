@@ -1,10 +1,10 @@
 # FormulaHub
 
-[![CI](https://github.com/pftlola270-byte/formula-reference-app/actions/workflows/deploy.yml/badge.svg)](https://github.com/pftlola270-byte/formula-reference-app/actions/workflows/deploy.yml) [![Tests](https://img.shields.io/badge/tests-15%20passing-24a276)](myapp/src/__tests__/formulas.test.mjs) [![Formulas](https://img.shields.io/badge/formulas-100-526dff)](https://pftlola270-byte.github.io/formula-reference-app/)
+[![CI](https://github.com/pftlola270-byte/formula-reference-app/actions/workflows/deploy.yml/badge.svg)](https://github.com/pftlola270-byte/formula-reference-app/actions/workflows/deploy.yml) [![Tests](https://img.shields.io/badge/tests-17%20passing-24a276)](myapp/src/__tests__/formulas.test.mjs) [![Formulas](https://img.shields.io/badge/formulas-100-526dff)](https://pftlola270-byte.github.io/formula-reference-app/)
 
 ![FormulaHub live demo](docs/screenshots/formulahub-live-demo.webp)
 
-FormulaHub is an English, searchable science reference and learning system for mathematics, physics, engineering, chemistry, statistics, and finance. It combines a curated library of **100 formulas** with calculators, explanations, examples, diagrams, quizzes, and practical unit conversion.
+FormulaHub is a multilingual, searchable science reference and learning system for mathematics, physics, engineering, chemistry, statistics, and finance. It combines a curated library of **100 formulas** with calculators, explanations, examples, diagrams, quizzes, and practical unit conversion.
 
 ## Features
 
@@ -26,7 +26,7 @@ The fastest way to evaluate the project is to open the live demo: it includes 10
 
 ### Academic traceability (v1.1)
 
-FormulaHub is introducing academic source traceability incrementally. Verified records use a shared source schema with a title, organization, secure URL, chapter or section when confirmed, a rationale for relevance, and `verified: true`. The first verified batch covers selected physics, chemistry, statistics, and probability relationships; unverified formulas are intentionally not assigned guessed references.
+Academic traceability is being introduced incrementally, with verified source records added only after direct verification. Verified records use a shared source schema with a title, organization, secure URL, chapter or section when confirmed, a rationale for relevance, `sourceType: "direct"` or `"supporting"`, and `verified: true`. Supporting sources are explicitly distinguished from direct formula references. Unverified formulas use `source: null` and are displayed as “Academic source: Not yet verified”; they are intentionally not assigned guessed references. The current release contains 8 verified source records across selected physics, chemistry, statistics, and probability relationships.
 
 ## Project structure
 

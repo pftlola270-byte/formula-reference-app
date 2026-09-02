@@ -35,19 +35,21 @@ test('every registry entry has complete executable and educational metadata', ()
     assert.ok(Array.isArray(item.variables) && item.variables.length > 0, `${item.name} must have variables`)
     assert.equal(typeof item.calculate, 'function', `${item.name} must have a calculation function`)
     assert.ok(typeof item.resultUnit === 'string', `${item.name} must have a result unit`)
-    assert.ok(item.meaning && item.assumptions && item.example && item.source && item.difficulty, `${item.name} must have enriched metadata`)
+    assert.ok(item.meaning && item.assumptions && item.example && item.difficulty, `${item.name} must have enriched metadata`)
+    assert.ok(item.source === null || typeof item.source === 'object' || typeof item.source === 'string', `${item.name} source must be null or structured`)
     assert.equal(new Set(item.variables.map((variable) => variable.key)).size, item.variables.length, `${item.name} variable keys must be unique`)
   }
 })
 
 test('verified source records follow the traceability schema', () => {
-  const traceable = formulas.filter((item) => typeof item.source === 'object')
+  const traceable = formulas.filter((item) => typeof item.source === 'object' && item.source !== null)
   assert.ok(traceable.length >= 8)
   for (const item of traceable) {
     assert.ok(item.source.title?.trim(), `${item.name} source needs a title`)
     assert.ok(item.source.organization?.trim(), `${item.name} source needs an organization`)
     assert.match(item.source.url, /^https:\/\//, `${item.name} source needs a secure URL`)
     assert.equal(item.source.verified, true, `${item.name} source must be verified`)
+    assert.ok(['direct', 'supporting'].includes(item.source.sourceType), `${item.name} source needs direct/supporting type`)
     assert.ok(item.source.rationale?.trim(), `${item.name} source needs a rationale`)
   }
 })
